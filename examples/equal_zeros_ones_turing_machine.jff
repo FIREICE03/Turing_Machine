@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created for Module 5 - Turing Machine Simulator (JFLAP Compatible) -->
+<!-- Topic: Classic Non-Regular Language 0ⁿ1ⁿ Recognizer -->
+<structure>
+	<type>turing</type>
+	<automaton>
+		<!-- The list of states. -->
+		<state id="0" name="q₀">
+			<x>120.0</x>
+			<y>216.0</y>
+			<initial/>
+		</state>
+		<state id="1" name="q₁">
+			<x>384.0</x>
+			<y>216.0</y>
+		</state>
+		<state id="2" name="q₂">
+			<x>648.0</x>
+			<y>216.0</y>
+		</state>
+		<state id="3" name="q₃">
+			<x>384.0</x>
+			<y>444.0</y>
+		</state>
+		<state id="4" name="q_acc">
+			<x>648.0</x>
+			<y>444.0</y>
+			<final/>
+		</state>
+		<state id="5" name="q_rej">
+			<x>912.0</x>
+			<y>216.0</y>
+		</state>
+		<!-- The list of transitions. -->
+		<transition>
+			<from>0</from>
+			<to>1</to>
+			<read>0</read>
+			<write>X</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>3</to>
+			<read>Y</read>
+			<write>Y</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>4</to>
+			<read/>
+			<write/>
+			<move>S</move>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>1</to>
+			<read>0</read>
+			<write>0</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>1</to>
+			<read>Y</read>
+			<write>Y</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>2</to>
+			<read>1</read>
+			<write>Y</write>
+			<move>L</move>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>2</to>
+			<read>0</read>
+			<write>0</write>
+			<move>L</move>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>2</to>
+			<read>Y</read>
+			<write>Y</write>
+			<move>L</move>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>0</to>
+			<read>X</read>
+			<write>X</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>3</to>
+			<read>Y</read>
+			<write>Y</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>4</to>
+			<read/>
+			<write/>
+			<move>S</move>
+		</transition>
+	</automaton>
+</structure>

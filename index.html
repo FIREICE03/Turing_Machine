@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turing Machine Simulator — JFLAP Compatible & Interactive TOC Visualizer</title>
+  <meta name="description" content="Interactive single-tape Turing Machine Simulator with SVG state diagram, infinite tape visualization, step-by-step trace log, batch test suite, and bidirectional JFLAP .jff export/import.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><path d='M22 32h56M50 32v38M34 70h32' stroke='white' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <meta property="og:title" content="Turing Machine Simulator — JFLAP Compatible & Interactive TOC Visualizer">
+  <meta property="og:description" content="Interactive single-tape Turing Machine Simulator with SVG state diagram, infinite tape visualization, step-by-step trace log, batch test suite, and bidirectional JFLAP .jff export/import.">
+  <meta property="og:type" content="website">
+  <meta name="author" content="Vishal Kumar Gupta">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <h1 class="header-title">Turing Machine Simulator</h1>
+        <span class="header-badge">JFLAP 7/8 Compatible</span>
+      </div>
+      <div class="header-controls">
+        <select id="machineSelect" class="select" title="Select Turing Machine preset">
+          <option value="even_ones" selected>Even Number of 1s</option>
+          <option value="equal_zeros_ones">0ⁿ1ⁿ (Equal 0s and 1s)</option>
+          <option value="palindrome">Binary Palindrome (w = wᴿ)</option>
+        </select>
+        <button id="soundToggleBtn" class="btn btn-outline-sm" title="Toggle mechanical audio effects">
+          <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          <span class="btn-label">Sound: ON</span>
+        </button>
+        <button id="themeToggleBtn" class="btn btn-outline-sm" title="Toggle dark / light mode" aria-label="Toggle theme">
+          <svg class="ui-icon theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button id="importJflapBtn" class="btn btn-outline-sm" title="Import any single-tape JFLAP .jff file">
+          <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><polyline points="12 11 12 17"></polyline><polyline points="9 14 12 11 15 14"></polyline></svg>
+          <span class="btn-label">Import .jff</span>
+        </button>
+        <input type="file" id="jflapFileInput" accept=".jff,.xml" style="display: none;">
+        <button id="customMachineBtn" class="btn btn-outline-sm" title="Create or edit custom Turing Machine">
+          <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span class="btn-label">Custom Machine</span>
+        </button>
+        <button id="downloadJflapBtn" class="btn btn-primary-sm" title="Export to JFLAP .jff XML">
+          <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span class="btn-label">Export .jff</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Language Description Bar -->
+    <section class="language-bar">
+      <div class="lang-text-container">
+        <h2 id="machineTitle">Turing Machine for Binary Strings with an Even Number of 1s</h2>
+        <p id="machineDescription">
+          Language: <code>L = { w ∈ {0, 1}* | |w|₁ mod 2 = 0 }</code>
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Panel: Tape (left) + SVG Diagram (right) -->
+    <section class="main-panel">
+
+      <!-- Left: Tape & Playback Controls -->
+      <div class="tape-side">
+        <!-- Status Row -->
+        <div class="tape-status-row">
+          <span class="label-pair">State: <strong id="currentStateBadge" class="state-tag">q0</strong></span>
+          <span class="label-pair">Step: <strong id="stepCountDisplay">0</strong></span>
+          <span class="label-pair">Head: <strong id="headIndexDisplay">0</strong></span>
+          <span id="statusBadge" class="status-tag ready">READY</span>
+        </div>
+
+        <!-- Instantaneous Description (ID) Live Display -->
+        <div class="id-banner" title="Formal Turing Machine Configuration: u (State) v">
+          <div class="id-banner-header">
+            <span class="id-banner-title">
+              <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+              Instantaneous Description (ID)
+            </span>
+            <span class="id-banner-format">u (q) v</span>
+          </div>
+          <div id="instantaneousDescriptionDisplay" class="id-banner-content">
+            <span class="id-eps">ε</span> <span class="id-state ready">q0</span> <span class="id-head-sym">1</span><span class="id-str">011001</span>
+          </div>
+        </div>
+
+        <!-- Interactive Sliding Tape Track -->
+        <div class="tape-container">
+          <div class="tape-head-indicator">
+            <span class="head-arrow">
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+                <polygon points="1,2 15,2 8,11"></polygon>
+              </svg>
+            </span>
+            <span class="head-label">HEAD</span>
+          </div>
+          <div class="tape-viewport" id="tapeTrackWrapper">
+            <div class="tape-track" id="tapeTrack"></div>
+          </div>
+        </div>
+
+        <!-- Input Box & Load Button -->
+        <div class="controls-row">
+          <div class="input-group">
+            <label for="inputTapeString">Tape Input:</label>
+            <input type="text" id="inputTapeString" class="input-mono" placeholder="e.g. 1011001" value="1011001" spellcheck="false" autocomplete="off">
+            <button id="loadTapeBtn" class="btn btn-sm">Load</button>
+          </div>
+        </div>
+        <div id="inputValidationMsg" class="validation-msg"></div>
+
+        <!-- Quick Preset Chips -->
+        <div class="quick-presets-row">
+          <span class="quick-presets-title">
+            <svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Presets:
+          </span>
+          <div id="quickPresetsContainer" class="quick-presets-chips"></div>
+        </div>
+
+        <!-- Playback Navigation Controls -->
+        <div class="playback-row">
+          <button id="stepBackBtn" class="btn btn-sm" disabled title="Step Backward (Undo transition)">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+            <span>Back</span>
+          </button>
+          <button id="playPauseBtn" class="btn btn-primary-sm" title="Run or Pause automatic simulation">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+            <span>Run</span>
+          </button>
+          <button id="stepForwardBtn" class="btn btn-sm" title="Step Forward 1 transition">
+            <span>Step</span>
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+          </button>
+          <button id="resetBtn" class="btn btn-sm btn-muted" title="Reset simulation to initial state">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+            <span>Reset</span>
+          </button>
+          <div class="speed-group">
+            <label for="speedSlider">Speed</label>
+            <input type="range" id="speedSlider" min="50" max="1500" step="50" value="500">
+            <span id="speedValueLabel" class="speed-val">500ms</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: SVG State Diagram -->
+      <div class="diagram-side">
+        <svg id="transitionSvg" viewBox="0 0 820 640" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="diagram-legend">
+          <span><span class="dot dot-start"></span> Start</span>
+          <span><span class="dot dot-accept"></span> Accept</span>
+          <span><span class="dot dot-reject"></span> Reject</span>
+          <span><span class="dot dot-active"></span> Active State</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Formal 7-Tuple Definition Section -->
+    <section class="tuple-section">
+      <h3 class="section-heading">Formal Definition &mdash; M = (Q, &Sigma;, &Gamma;, &delta;, q₀, B, F)</h3>
+      <div class="tuple-grid" id="tupleDetails"></div>
+    </section>
+
+    <!-- Accordion 1: Transition Function Table (δ) — immediately after the 7-tuple formal definition -->
+    <section class="collapsible-section" id="transitionTableSection">
+      <div class="section-header-bar" id="toggleTransitionBtn" role="button" tabindex="0">
+        <div class="header-left">
+          <span id="toggleArrow" class="accordion-arrow">
+            <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+          <span class="section-title">Transition Function Table (&delta;)</span>
+          <span id="transitionCountBadge" class="badge-pill">6 Rules</span>
+        </div>
+        <div class="header-right">
+          <span class="trace-hint">Highlights active rule during simulation</span>
+        </div>
+      </div>
+      <div id="transitionTableWrapper" class="collapsible-body">
+        <div class="table-responsive">
+          <table class="data-table" id="transitionTable">
+            <thead>
+              <tr>
+                <th>Current State (q)</th>
+                <th>Read Symbol (σ)</th>
+                <th>Next State (q')</th>
+                <th>Write Symbol (σ')</th>
+                <th>Move (D)</th>
+                <th>Formal Semantic Meaning</th>
+              </tr>
+            </thead>
+            <tbody id="transitionTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Accordion 2: Automated Batch Test Suite -->
+    <section class="collapsible-section" id="batchTestSection">
+      <div class="section-header-bar" id="toggleBatchTestBtn" role="button" tabindex="0">
+        <div class="header-left">
+          <span id="batchTestArrow" class="accordion-arrow collapsed">
+            <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+          <span class="section-title">Automated Batch Test Suite</span>
+          <span id="batchTestSummaryBadge" class="badge-pill">12 Tests</span>
+        </div>
+        <div class="header-right">
+          <span id="testSuiteScore" class="test-score-text">Ready to run</span>
+        </div>
+      </div>
+      <div id="batchTestWrapper" class="collapsible-body hidden">
+        <div class="section-toolbar">
+          <button id="runAllTestsBtn" class="btn btn-primary-sm">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+            <span>Run All Tests</span>
+          </button>
+          <button id="addCustomTestBtn" class="btn btn-outline-sm">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Add Custom Test</span>
+          </button>
+          <button id="resetDefaultTestsBtn" class="btn btn-sm btn-muted">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+            <span>Reset Tests</span>
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="batchTestTable">
+            <thead>
+              <tr>
+                <th>Input String</th>
+                <th>Description / Case</th>
+                <th>Expected</th>
+                <th>Actual</th>
+                <th>Result</th>
+                <th>Steps</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="batchTestTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Accordion 3: Execution Trace Log (History Table) -->
+    <section class="collapsible-section" id="traceLogSection">
+      <div class="section-header-bar" id="toggleTraceLogBtn" role="button" tabindex="0">
+        <div class="header-left">
+          <span id="traceLogArrow" class="accordion-arrow collapsed">
+            <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+          <span class="section-title">Execution Trace Log</span>
+          <span id="traceLogCountBadge" class="badge-pill">0 Steps</span>
+        </div>
+        <div class="header-right">
+          <span class="trace-hint">Real-time state and configuration log</span>
+        </div>
+      </div>
+      <div id="traceLogWrapper" class="collapsible-body hidden">
+        <div class="section-toolbar">
+          <button id="exportTraceCsvBtn" class="btn btn-outline-sm">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export CSV</span>
+          </button>
+          <button id="clearTraceLogBtn" class="btn btn-sm btn-muted">
+            <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Clear History</span>
+          </button>
+          <span class="trace-counter-label" id="traceStatusLabel">No transitions recorded yet.</span>
+        </div>
+        <div class="table-responsive trace-table-container">
+          <table class="data-table" id="traceTable">
+            <thead>
+              <tr>
+                <th>Step #</th>
+                <th>Current State</th>
+                <th>Read</th>
+                <th>Next State</th>
+                <th>Write</th>
+                <th>Move</th>
+                <th>Instantaneous Description (ID)</th>
+                <th>Explanation</th>
+              </tr>
+            </thead>
+            <tbody id="traceTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JFLAP Export Modal -->
+  <div id="jflapModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-top">
+        <h3>JFLAP Export (.jff)</h3>
+        <button id="closeModalBtn" class="btn-close">&times;</button>
+      </div>
+      <p class="modal-subtitle">Compatible with JFLAP 7.1 and 8.x. Copy XML to clipboard or download the <code>.jff</code> file.</p>
+      <pre class="modal-code"><code id="jflapXmlContent"></code></pre>
+      <div class="modal-actions">
+        <button id="copyXmlBtn" class="btn btn-sm">Copy XML</button>
+        <button id="downloadXmlFileBtn" class="btn btn-primary-sm">Download .jff</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Machine Builder / Editor Modal -->
+  <div id="customMachineModal" class="modal-overlay hidden">
+    <div class="modal-box modal-lg">
+      <div class="modal-top">
+        <h3 class="modal-title-with-icon">
+          <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Custom Turing Machine Builder
+        </h3>
+        <button id="closeCustomModalBtn" class="btn-close">&times;</button>
+      </div>
+      <p class="modal-subtitle">Design your own Turing Machine or modify transitions. You can also import/export JSON configurations.</p>
+      
+      <div class="custom-builder-form">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="customMachineTitle">Machine Title:</label>
+            <input type="text" id="customMachineTitle" class="input-text" placeholder="e.g. Binary Complement Machine">
+          </div>
+          <div class="form-group">
+            <label for="customInitialState">Initial State (q₀):</label>
+            <input type="text" id="customInitialState" class="input-text" placeholder="e.g. q0" value="q0">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="customAcceptStates">Accept States (comma-separated):</label>
+            <input type="text" id="customAcceptStates" class="input-text" placeholder="e.g. q_accept" value="q_accept">
+          </div>
+          <div class="form-group">
+            <label for="customRejectStates">Reject States (optional, comma-separated):</label>
+            <input type="text" id="customRejectStates" class="input-text" placeholder="e.g. q_reject" value="q_reject">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="transitions-header">
+            <label for="customTransitionsJson">Transitions & Machine JSON:</label>
+            <button id="loadSampleTemplateBtn" class="btn btn-xs btn-outline">Load 2-State Template</button>
+          </div>
+          <textarea id="customTransitionsJson" class="textarea-mono" rows="10" placeholder="Paste or edit machine JSON..."></textarea>
+          <div id="customMachineError" class="validation-msg"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="cancelCustomBtn" class="btn btn-sm btn-muted">Cancel</button>
+        <button id="saveCustomMachineBtn" class="btn btn-primary-sm">Save & Load in Simulator</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Custom Test Case Modal -->
+  <div id="addTestModal" class="modal-overlay hidden">
+    <div class="modal-box modal-sm">
+      <div class="modal-top">
+        <h3>Add Test Case</h3>
+        <button id="closeAddTestBtn" class="btn-close">&times;</button>
+      </div>
+      <div class="custom-test-form">
+        <div class="form-group">
+          <label for="customTestInput">Test Input String:</label>
+          <input type="text" id="customTestInput" class="input-mono" placeholder="e.g. 10101" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="customTestExpected">Expected Outcome:</label>
+          <select id="customTestExpected" class="select">
+            <option value="ACCEPT">ACCEPT</option>
+            <option value="REJECT">REJECT</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="customTestLabel">Description / Label:</label>
+          <input type="text" id="customTestLabel" class="input-text" placeholder="e.g. Custom corner case">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelAddTestBtn" class="btn btn-sm btn-muted">Cancel</button>
+        <button id="saveCustomTestBtn" class="btn btn-primary-sm">Add Test</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Theory of Computation &bull; Module 5: Turing Machine Simulator</p>
+      <p class="footer-sub">Designed & Engineered by <strong>Vishal Kumar Gupta</strong> &bull; MIT Licensed</p>
+    </div>
+  </footer>
+
+  <!-- Scripts in dependency order -->
+  <script src="js/audio.js"></script>
+  <script src="js/turingMachine.js"></script>
+  <script src="js/diagram.js"></script>
+  <script src="js/jflapExport.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

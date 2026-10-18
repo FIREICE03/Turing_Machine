@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created for Module 5 - Turing Machine Simulator (JFLAP Compatible) -->
+<!-- Topic: Design and Simulation of a Turing Machine for Binary Strings with an Even Number of 1s -->
+<structure>
+	<type>turing</type>
+	<automaton>
+		<!-- The list of states. -->
+		<state id="0" name="q₀">
+			<x>264.0</x>
+			<y>204.0</y>
+			<initial/>
+		</state>
+		<state id="1" name="q₁">
+			<x>672.0</x>
+			<y>204.0</y>
+		</state>
+		<state id="2" name="q_acc">
+			<x>264.0</x>
+			<y>420.0</y>
+			<final/>
+		</state>
+		<state id="3" name="q_rej">
+			<x>672.0</x>
+			<y>420.0</y>
+		</state>
+		<!-- The list of transitions. -->
+		<transition>
+			<from>0</from>
+			<to>0</to>
+			<read>0</read>
+			<write>0</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>1</to>
+			<read>1</read>
+			<write>1</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>2</to>
+			<read/>
+			<write/>
+			<move>S</move>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>1</to>
+			<read>0</read>
+			<write>0</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>0</to>
+			<read>1</read>
+			<write>1</write>
+			<move>R</move>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>3</to>
+			<read/>
+			<write/>
+			<move>S</move>
+		</transition>
+	</automaton>
+</structure>

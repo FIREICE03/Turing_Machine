@@ -1,0 +1,27 @@
+{
+  "name": "turing-machine-simulator",
+  "version": "1.0.0",
+  "description": "Interactive single-tape Turing Machine Simulator with SVG state diagram, infinite tape visualization, execution trace log, automated batch test bench, and bidirectional JFLAP .jff compatibility.",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "node test/verify.js",
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "turing-machine",
+    "theory-of-computation",
+    "automata-theory",
+    "jflap",
+    "jff",
+    "formal-languages",
+    "finite-automata",
+    "simulator",
+    "visualization"
+  ],
+  "author": "Vishal Kumar Gupta",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/turing-machine-simulator.git"
+  }
+}
