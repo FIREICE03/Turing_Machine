@@ -21,7 +21,7 @@ const MACHINE_PRESETS = {
     initialState: 'q0',
     acceptStates: ['q_accept'],
     rejectStates: ['q_reject'],
-    viewBox: '0 0 780 480',
+    viewBox: '120 40 520 370',
     states: [
       { id: 'q0', name: 'q₀', subtitle: 'Even 1s', isInitial: true, isAccept: false, isReject: false, x: 220, y: 170, loopDir: 'top' },
       { id: 'q1', name: 'q₁', subtitle: 'Odd 1s', isInitial: false, isAccept: false, isReject: false, x: 560, y: 170, loopDir: 'top' },
@@ -79,7 +79,7 @@ const MACHINE_PRESETS = {
     initialState: 'q0',
     acceptStates: ['q4'],
     rejectStates: ['q_reject'],
-    viewBox: '0 0 900 500',
+    viewBox: '15 45 805 465',
     states: [
       { id: 'q0', name: 'q₀', subtitle: 'Start', isInitial: true, isAccept: false, isReject: false, x: 100, y: 180 },
       { id: 'q1', name: 'q₁', subtitle: 'Find 1', isInitial: false, isAccept: false, isReject: false, x: 320, y: 180, loopDir: 'top' },
@@ -137,7 +137,7 @@ const MACHINE_PRESETS = {
     initialState: 'q0',
     acceptStates: ['q_acc'],
     rejectStates: ['q_rej'],
-    viewBox: '0 0 860 580',
+    viewBox: '40 15 780 545',
     states: [
       { id: 'q_acc', name: 'accept', subtitle: 'q_acc', color: '#ec4899', strokeColor: '#eab308', textColor: '#ffffff', isAccept: true, x: 430, y: 65 },
       { id: 'q1', name: 'haveA', subtitle: 'read 0', color: '#ea580c', textColor: '#ffffff', x: 160, y: 210, loopDir: 'top-left' },
@@ -204,7 +204,7 @@ const MACHINE_PRESETS = {
     initialState: 'q0',
     acceptStates: ['q_done'],
     rejectStates: [],
-    viewBox: '0 0 780 380',
+    viewBox: '70 65 620 220',
     states: [
       { id: 'q0', name: 'q₀', subtitle: 'Scan Right', isInitial: true, isAccept: false, isReject: false, x: 160, y: 190, loopDir: 'top' },
       { id: 'q1', name: 'q₁', subtitle: 'Add Carry', isInitial: false, isAccept: false, isReject: false, x: 400, y: 190, loopDir: 'top' },

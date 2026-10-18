@@ -97,6 +97,7 @@ $$q_0 \sqcup \vdash (q_{accept}) \sqcup \quad \text{[ACCEPTED]}$$
 
 2. **Dynamic SVG State Transition Diagram**:
    - Clean vector graph layout with curved transitions, self-loops, and start/accept indicators.
+   - **Mobile-Responsive Zoom & Pan**: Dedicated diagram toolbar with Zoom In (`+`), Zoom Out (`-`), Fit-to-screen (`Fit`), touch-drag panning, pinch-to-zoom on phones, and 1-click **Fullscreen Mode** for inspecting state transitions comfortably on any screen size.
    - **Real-time Live Glow**: Active state node and transition edge glow dynamically with theme accents.
 
 3. **Live Instantaneous Description (ID) Bar**:

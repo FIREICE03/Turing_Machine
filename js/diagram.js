@@ -11,6 +11,181 @@ class StateDiagramRenderer {
     this.activeState = null;
     this.activeTransition = null;
     this.currentPreset = null;
+    this.zoomLevel = 1.0;
+    this.panOffset = { x: 0, y: 0 };
+    this.baseViewBox = { x: 0, y: 0, w: 780, h: 480 };
+  }
+
+  parseViewBox(vbStr) {
+    if (!vbStr) return { x: 0, y: 0, w: 780, h: 480 };
+    const parts = vbStr.trim().split(/\s+/).map(Number);
+    return {
+      x: isNaN(parts[0]) ? 0 : parts[0],
+      y: isNaN(parts[1]) ? 0 : parts[1],
+      w: isNaN(parts[2]) ? 780 : parts[2],
+      h: isNaN(parts[3]) ? 480 : parts[3]
+    };
+  }
+
+  setZoom(newZoom, focalX = null, focalY = null) {
+    const minZoom = 0.5;
+    const maxZoom = 4.0;
+    const clampedZoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
+
+    if (focalX !== null && focalY !== null && this.svg) {
+      const rect = this.svg.getBoundingClientRect();
+      const clickRatioX = (focalX - rect.left) / (rect.width || 1);
+      const clickRatioY = (focalY - rect.top) / (rect.height || 1);
+
+      const oldW = this.baseViewBox.w / this.zoomLevel;
+      const oldH = this.baseViewBox.h / this.zoomLevel;
+      const newW = this.baseViewBox.w / clampedZoom;
+      const newH = this.baseViewBox.h / clampedZoom;
+
+      const pX = (this.baseViewBox.x + (this.baseViewBox.w - oldW) / 2 + this.panOffset.x) + clickRatioX * oldW;
+      const pY = (this.baseViewBox.y + (this.baseViewBox.h - oldH) / 2 + this.panOffset.y) + clickRatioY * oldH;
+
+      this.panOffset.x = pX - clickRatioX * newW - (this.baseViewBox.x + (this.baseViewBox.w - newW) / 2);
+      this.panOffset.y = pY - clickRatioY * newH - (this.baseViewBox.y + (this.baseViewBox.h - newH) / 2);
+    }
+
+    this.zoomLevel = clampedZoom;
+    this.applyTransform();
+  }
+
+  pan(dx, dy) {
+    if (!this.svg) return;
+    const rect = this.svg.getBoundingClientRect();
+    const scaleX = (this.baseViewBox.w / this.zoomLevel) / (rect.width || 1);
+    const scaleY = (this.baseViewBox.h / this.zoomLevel) / (rect.height || 1);
+    this.panOffset.x -= dx * scaleX;
+    this.panOffset.y -= dy * scaleY;
+    this.applyTransform();
+  }
+
+  resetZoom() {
+    this.zoomLevel = 1.0;
+    this.panOffset = { x: 0, y: 0 };
+    this.applyTransform();
+  }
+
+  applyTransform() {
+    if (!this.svg) return;
+    const curW = this.baseViewBox.w / this.zoomLevel;
+    const curH = this.baseViewBox.h / this.zoomLevel;
+    const curX = this.baseViewBox.x + (this.baseViewBox.w - curW) / 2 + this.panOffset.x;
+    const curY = this.baseViewBox.y + (this.baseViewBox.h - curH) / 2 + this.panOffset.y;
+
+    this.svg.setAttribute('viewBox', `${curX} ${curY} ${curW} ${curH}`);
+
+    const badge = document.getElementById('diagramZoomBadge');
+    if (badge) {
+      badge.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+    }
+  }
+
+  setupInteractions(wrapElement) {
+    if (!wrapElement || wrapElement._hasInteractions) return;
+    wrapElement._hasInteractions = true;
+
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let initialTouchDist = 0;
+    let initialZoom = 1.0;
+
+    // Mouse Drag
+    wrapElement.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      wrapElement.classList.add('panning');
+    });
+
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      this.pan(dx, dy);
+      startX = e.clientX;
+      startY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        wrapElement.classList.remove('panning');
+      }
+    });
+
+    // Mouse Wheel Zoom
+    wrapElement.addEventListener('wheel', e => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 0.87;
+      this.setZoom(this.zoomLevel * factor, e.clientX, e.clientY);
+    }, { passive: false });
+
+    // Touch Drag & Pinch Zoom (Mobile Phones & Tablets)
+    wrapElement.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        wrapElement.classList.add('panning');
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        initialTouchDist = Math.hypot(dx, dy);
+        initialZoom = this.zoomLevel;
+      }
+    }, { passive: true });
+
+    wrapElement.addEventListener('touchmove', e => {
+      if (e.touches.length === 1 && isDragging) {
+        const dx = e.touches[0].clientX - startX;
+        const dy = e.touches[0].clientY - startY;
+        this.pan(dx, dy);
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        e.preventDefault();
+      } else if (e.touches.length === 2 && initialTouchDist > 0) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        const factor = dist / initialTouchDist;
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        this.setZoom(initialZoom * factor, midX, midY);
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    wrapElement.addEventListener('touchend', e => {
+      if (e.touches.length === 0) {
+        isDragging = false;
+        initialTouchDist = 0;
+        wrapElement.classList.remove('panning');
+      } else if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }
+    });
+
+    // Double click / Double tap to toggle quick zoom
+    let lastTap = 0;
+    wrapElement.addEventListener('click', e => {
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        if (Math.abs(this.zoomLevel - 1.0) < 0.15) {
+          this.setZoom(1.65, e.clientX, e.clientY);
+        } else {
+          this.resetZoom();
+        }
+      }
+      lastTap = now;
+    });
   }
 
   /** Return color palette matching current theme */
@@ -43,8 +218,8 @@ class StateDiagramRenderer {
     this.currentPreset = preset;
     this.svg.innerHTML = '';
 
-    // Dynamically set viewBox to fit preset structure perfectly
-    this.svg.setAttribute('viewBox', preset.viewBox || '0 0 820 640');
+    this.baseViewBox = this.parseViewBox(preset.viewBox || '0 0 780 480');
+    this.resetZoom();
 
     this.createSvgDefs();
 
@@ -68,6 +243,7 @@ class StateDiagramRenderer {
     this.svg.appendChild(nodesGroup);
 
     if (this.activeState) this.highlightState(this.activeState);
+    this.applyTransform();
   }
 
   createSvgDefs() {

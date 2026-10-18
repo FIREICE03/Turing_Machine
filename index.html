@@ -154,8 +154,34 @@
       </div>
 
       <!-- Right: SVG State Diagram -->
-      <div class="diagram-side">
-        <svg id="transitionSvg" viewBox="0 0 820 640" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="diagram-side" id="diagramContainer">
+        <div class="diagram-header-bar">
+          <div class="diagram-header-left">
+            <span class="diagram-title">State Transition Diagram</span>
+            <span class="diagram-zoom-badge" id="diagramZoomBadge" title="Current Zoom Level">100%</span>
+          </div>
+          <div class="diagram-controls-group">
+            <button id="zoomOutBtn" class="btn-icon" title="Zoom Out (-)" aria-label="Zoom Out">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button id="zoomResetBtn" class="btn-icon btn-icon-text" title="Fit to Screen" aria-label="Reset Zoom">Fit</button>
+            <button id="zoomInBtn" class="btn-icon" title="Zoom In (+)" aria-label="Zoom In">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button id="diagramFullscreenBtn" class="btn-icon" title="Toggle Fullscreen View" aria-label="Toggle Fullscreen">
+              <svg class="fullscreen-open-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+              <svg class="fullscreen-close-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="diagram-canvas-wrap" id="diagramCanvasWrap">
+          <svg id="transitionSvg" viewBox="0 0 780 480" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="diagram-mobile-hint" id="diagramMobileHint">
+            <span>Pinch or tap + to zoom &bull; Drag to pan</span>
+          </div>
+        </div>
+
         <div class="diagram-legend">
           <span><span class="dot dot-start"></span> Start</span>
           <span><span class="dot dot-accept"></span> Accept</span>
